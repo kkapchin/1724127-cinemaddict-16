@@ -20,7 +20,7 @@ const movies = Array.from({length: MOVIES_COUNT}, getMovie);
 
 render(header, createUserProfileTemplate(), RenderPosition.BEFOREEND);
 render(main, createSortTemplate(), RenderPosition.AFTERBEGIN);
-render(main, createNavigationTemplate(), RenderPosition.AFTERBEGIN);
+render(main, createNavigationTemplate(movies), RenderPosition.AFTERBEGIN);
 render(footer, createFooterStatsTemplate(), 'afterbegin');
 
 for (let i = 0; i < Math.min(movies.length, MOVIES_COUNT_PER_STEP); i++) {
