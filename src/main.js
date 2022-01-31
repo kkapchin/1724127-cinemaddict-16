@@ -1,12 +1,12 @@
 import { getMovie } from './mock/movies';
 import { render, renderElement, RenderPosition } from './utils/render';
 import { createFilmCardTemplate } from './view/film-card';
-//import { createFilmPopupTemplate } from './view/film-popup';
 import FooterStatsView from './view/footer-statistics';
 import FilterView from './view/filter';
 import ShowMoreButtonView from './view/show-more-button';
 import SortView from './view/sort';
 import UserProfileView from './view/user-profile';
+//import FilmPopupView from './view/film-popup';
 
 const MOVIES_COUNT = 17;
 const MOVIES_COUNT_PER_STEP = 5;
@@ -48,4 +48,4 @@ if (movies.length > MOVIES_COUNT_PER_STEP) {
   });
 }
 
-//render(footer, createFilmPopupTemplate(movies[0]), RenderPosition.AFTERBEGIN);
+//renderElement(footer, new FilmPopupView(movies[0]).element, RenderPosition.AFTERBEGIN);
