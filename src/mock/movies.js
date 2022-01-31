@@ -106,10 +106,12 @@ const getFilmInfo = () => {
     ageRating: 0,
     director: 'Tom Ford',
     writers: [
-      'Takeshi Kitano'
+      'Takeshi Kitano',
+      'Kitashi Takeno',
     ],
     actors: [
-      'Morgan Freeman'
+      'Morgan Freeman',
+      'Freegan Morman',
     ],
     release: {
       date: '2019-05-11T00:00:00.000Z',
@@ -117,7 +119,9 @@ const getFilmInfo = () => {
     },
     runtime: getRandomInteger(120, 180),
     genre: [
-      'Comedy'
+      'Comedy',
+      'Action',
+      'Drama',
     ],
     description: getDescription(),
   };

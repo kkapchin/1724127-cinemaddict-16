@@ -1,13 +1,14 @@
 import { getMovie } from './mock/movies';
 import { render, RenderPosition } from './utils/render';
 import { createFilmCardTemplate } from './view/film-card';
+//import { createFilmPopupTemplate } from './view/film-popup';
 import { createFooterStatsTemplate } from './view/footer-statistics';
 import { createNavigationTemplate } from './view/navigation';
 import { createShowMoreBtnTemplate } from './view/show-more-button';
 import { createSortTemplate } from './view/sort';
 import { createUserProfileTemplate } from './view/user-profile';
 
-const MOVIES_COUNT = 16;
+const MOVIES_COUNT = 17;
 const MOVIES_COUNT_PER_STEP = 5;
 
 const header = document.querySelector('.header');
@@ -46,3 +47,5 @@ if (movies.length > MOVIES_COUNT_PER_STEP) {
     }
   });
 }
+
+//render(footer, createFilmPopupTemplate(movies[0]), RenderPosition.AFTERBEGIN);
