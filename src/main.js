@@ -1,12 +1,12 @@
 import { getMovie } from './mock/movies';
-import { render, RenderPosition } from './utils/render';
+import { render, renderElement, RenderPosition } from './utils/render';
 import { createFilmCardTemplate } from './view/film-card';
 //import { createFilmPopupTemplate } from './view/film-popup';
 import { createFooterStatsTemplate } from './view/footer-statistics';
 import { createNavigationTemplate } from './view/navigation';
 import { createShowMoreBtnTemplate } from './view/show-more-button';
 import { createSortTemplate } from './view/sort';
-import { createUserProfileTemplate } from './view/user-profile';
+import UserProfileView from './view/user-profile';
 
 const MOVIES_COUNT = 17;
 const MOVIES_COUNT_PER_STEP = 5;
@@ -18,7 +18,7 @@ const moviesContainer = main.querySelector('.films-list__container');
 const buttonContainer = main.querySelector('.films-list');
 const movies = Array.from({length: MOVIES_COUNT}, getMovie);
 
-render(header, createUserProfileTemplate(), RenderPosition.BEFOREEND);
+renderElement(header, new UserProfileView().element, RenderPosition.BEFOREEND);
 render(main, createSortTemplate(), RenderPosition.AFTERBEGIN);
 render(main, createNavigationTemplate(movies), RenderPosition.AFTERBEGIN);
 render(footer, createFooterStatsTemplate(), 'afterbegin');
