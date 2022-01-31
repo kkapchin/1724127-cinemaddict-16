@@ -101,7 +101,7 @@ const getFilmInfo = () => {
   return {
     title: titles[index],
     alternativeTitle: 'Alt title',
-    totalRating: `${getRandomInteger(0, 9)}.${getRandomInteger(0, 9)}`,
+    totalRating: `${getRandomInteger(7, 9)}.${getRandomInteger(0, 9)}`,
     poster: posters[index],
     ageRating: 0,
     director: 'Tom Ford',
