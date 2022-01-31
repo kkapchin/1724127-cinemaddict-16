@@ -3,7 +3,7 @@ import { render, renderElement, RenderPosition } from './utils/render';
 import { createFilmCardTemplate } from './view/film-card';
 //import { createFilmPopupTemplate } from './view/film-popup';
 import FooterStatsView from './view/footer-statistics';
-import { createNavigationTemplate } from './view/navigation';
+import FilterView from './view/filter';
 import ShowMoreButtonView from './view/show-more-button';
 import SortView from './view/sort';
 import UserProfileView from './view/user-profile';
@@ -20,7 +20,7 @@ const movies = Array.from({length: MOVIES_COUNT}, getMovie);
 
 renderElement(header, new UserProfileView().element, RenderPosition.BEFOREEND);
 renderElement(main, new SortView().element, RenderPosition.AFTERBEGIN);
-render(main, createNavigationTemplate(movies), RenderPosition.AFTERBEGIN);
+renderElement(main, new FilterView(movies).element, RenderPosition.AFTERBEGIN);
 renderElement(footer, new FooterStatsView().element, RenderPosition.AFTERBEGIN);
 
 for (let i = 0; i < Math.min(movies.length, MOVIES_COUNT_PER_STEP); i++) {
