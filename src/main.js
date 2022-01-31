@@ -2,10 +2,10 @@ import { getMovie } from './mock/movies';
 import { render, renderElement, RenderPosition } from './utils/render';
 import { createFilmCardTemplate } from './view/film-card';
 //import { createFilmPopupTemplate } from './view/film-popup';
-import { createFooterStatsTemplate } from './view/footer-statistics';
+import FooterStatsView from './view/footer-statistics';
 import { createNavigationTemplate } from './view/navigation';
-import { createShowMoreBtnTemplate } from './view/show-more-button';
-import { createSortTemplate } from './view/sort';
+import ShowMoreButtonView from './view/show-more-button';
+import SortView from './view/sort';
 import UserProfileView from './view/user-profile';
 
 const MOVIES_COUNT = 17;
@@ -19,9 +19,9 @@ const buttonContainer = main.querySelector('.films-list');
 const movies = Array.from({length: MOVIES_COUNT}, getMovie);
 
 renderElement(header, new UserProfileView().element, RenderPosition.BEFOREEND);
-render(main, createSortTemplate(), RenderPosition.AFTERBEGIN);
+renderElement(main, new SortView().element, RenderPosition.AFTERBEGIN);
 render(main, createNavigationTemplate(movies), RenderPosition.AFTERBEGIN);
-render(footer, createFooterStatsTemplate(), 'afterbegin');
+renderElement(footer, new FooterStatsView().element, RenderPosition.AFTERBEGIN);
 
 for (let i = 0; i < Math.min(movies.length, MOVIES_COUNT_PER_STEP); i++) {
   render(moviesContainer, createFilmCardTemplate(movies[i]), RenderPosition.BEFOREEND);
@@ -30,7 +30,7 @@ for (let i = 0; i < Math.min(movies.length, MOVIES_COUNT_PER_STEP); i++) {
 if (movies.length > MOVIES_COUNT_PER_STEP) {
   let renderedMoviesCount = MOVIES_COUNT_PER_STEP;
 
-  render(buttonContainer, createShowMoreBtnTemplate(), RenderPosition.BEFOREEND);
+  renderElement(buttonContainer, new ShowMoreButtonView().element, RenderPosition.BEFOREEND);
 
   const showMoreButton = buttonContainer.querySelector('.films-list__show-more');
 
