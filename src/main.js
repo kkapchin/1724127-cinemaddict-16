@@ -6,6 +6,7 @@ import ShowMoreButtonView from './view/show-more-button';
 import SortView from './view/sort';
 import UserProfileView from './view/user-profile';
 import FilmCardView from './view/film-card';
+import FilmPopupView from './view/film-popup';
 //import FilmPopupView from './view/film-popup';
 
 const MOVIES_COUNT = 17;
@@ -18,13 +19,20 @@ const moviesContainer = main.querySelector('.films-list__container');
 const buttonContainer = main.querySelector('.films-list');
 const movies = Array.from({length: MOVIES_COUNT}, getMovie);
 
+const renderFilmCard = (container, movie) => {
+  const filmCardComponent = new FilmCardView(movie);
+  //const filmPopupComponent = new FilmPopupView(movie);
+
+  render(container, filmCardComponent.element, RenderPosition.BEFOREEND);
+};
+
 render(header, new UserProfileView().element, RenderPosition.BEFOREEND);
 render(main, new SortView().element, RenderPosition.AFTERBEGIN);
 render(main, new FilterView(movies).element, RenderPosition.AFTERBEGIN);
 render(footer, new FooterStatsView().element, RenderPosition.AFTERBEGIN);
 
 for (let i = 0; i < Math.min(movies.length, MOVIES_COUNT_PER_STEP); i++) {
-  render(moviesContainer, new FilmCardView(movies[i]).element, RenderPosition.BEFOREEND);
+  renderFilmCard(moviesContainer, movies[i]);
 }
 
 if (movies.length > MOVIES_COUNT_PER_STEP) {
@@ -38,7 +46,7 @@ if (movies.length > MOVIES_COUNT_PER_STEP) {
     evt.preventDefault();
     movies
       .slice(renderedMoviesCount, renderedMoviesCount + MOVIES_COUNT_PER_STEP)
-      .forEach((movie) => render(moviesContainer, new FilmCardView(movie).element, RenderPosition.BEFOREEND));
+      .forEach((movie) => renderFilmCard(moviesContainer, movie));
 
     renderedMoviesCount += MOVIES_COUNT_PER_STEP;
 
