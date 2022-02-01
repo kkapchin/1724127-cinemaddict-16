@@ -31,12 +31,22 @@ const renderFilmCard = (container, movie) => {
     footer.parentElement.removeChild(filmPopupComponent.element);
   };
 
+  const onEscKeyDown = (evt) => {
+    if (evt.key === 'Escape' || evt.key === 'Esc') {
+      evt.preventDefault();
+      closePopup();
+      document.removeEventListener('keydown', onEscKeyDown);
+    }
+  };
+
   filmCardComponent.element.querySelector('.film-card__link').addEventListener('click', () => {
     renderPopup();
+    document.addEventListener('keydown', onEscKeyDown);
   });
 
   filmPopupComponent.element.querySelector('.film-details__close-btn').addEventListener('click', () => {
     closePopup();
+    document.removeEventListener('keydown', onEscKeyDown);
   });
 
   render(container, filmCardComponent.element, RenderPosition.BEFOREEND);
