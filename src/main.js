@@ -16,6 +16,7 @@ const main = document.querySelector('.main');
 const footer = document.querySelector('.footer');
 const moviesContainer = main.querySelector('.films-list__container');
 const buttonContainer = main.querySelector('.films-list');
+//const messageContainer = buttonContainer;
 const movies = Array.from({length: MOVIES_COUNT}, getMovie);
 
 const renderFilmCard = (container, movie) => {
