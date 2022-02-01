@@ -9,17 +9,18 @@ import FilmCardView from './view/film-card';
 import FilmPopupView from './view/film-popup';
 import NoFilmsView from './view/no-films';
 import FilmsListView from './view/films-list';
+import FilmsPresenter from './presenter/films-presenter';
 
 const MOVIES_COUNT = 17;
-const MOVIES_COUNT_PER_STEP = 5;
+/* const MOVIES_COUNT_PER_STEP = 5;
 
 const header = document.querySelector('.header');
 const main = document.querySelector('.main');
 const footer = document.querySelector('.footer');
-const filmsListElement = main.querySelector('.films-list');
+const filmsListElement = main.querySelector('.films-list'); */
 const films = Array.from({ length: MOVIES_COUNT }, getMovie);
 
-const renderFilmCard = (container, movie) => {
+/* const renderFilmCard = (container, movie) => {
   const filmCardComponent = new FilmCardView(movie);
   const filmPopupComponent = new FilmPopupView(movie);
 
@@ -96,6 +97,7 @@ const renderMovies = (moviesContainer, movies) => {
       });
     }
   }
-};
+}; */
 
-renderMovies(filmsListElement, films);
+//renderMovies(filmsListElement, films);
+new FilmsPresenter().init(films);
