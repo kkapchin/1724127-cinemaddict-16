@@ -1,9 +1,5 @@
 import dayjs from 'dayjs';
 
-export const render = (container, template, place) => {
-  container.insertAdjacentHTML(place, template);
-};
-
 export const RenderPosition = {
   BEFOREBEGIN: 'beforebegin',
   AFTERBEGIN: 'afterbegin',
@@ -24,7 +20,7 @@ export const getDuration = (minutes) => {
   return `${duration.format('mm')}m`;
 };
 
-export const renderElement = (container, element, place) => {
+export const render = (container, element, place) => {
   switch (place) {
     case RenderPosition.BEFOREBEGIN:
       container.before(element);
