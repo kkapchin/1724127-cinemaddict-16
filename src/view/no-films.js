@@ -1,9 +1,8 @@
-import { createElement } from '../utils/render';
+import AbstractView from './abstract-view';
 
 const createNoFilmsTemplate = (message) => `<h2 class="films-list__title">${message}</h2>`;
 
-export default class NoFilmsView {
-  #element = null;
+export default class NoFilmsView extends AbstractView {
   #Message = {
     ALL: 'There are no movies in our database',
     WATCHLIST: 'There are no movies to watch now',
@@ -15,8 +14,8 @@ export default class NoFilmsView {
   #history = 'There are no watched movies now';
   #favorites = 'There are no favorite movies now'; */
 
-  get element() {
-    /* switch(filter) {
+  /* get element() {
+    switch(filter) {
       case 'All':
         this.#element = createElement(this.template(this.#Message.ALL))
         return this.#element;
@@ -29,19 +28,10 @@ export default class NoFilmsView {
       case 'Favorites':
         this.#element = createElement(this.template(this.#Message.FAVORITES))
         return this.#element;
-    } */
-    if (!this.#element) {
-      this.#element = createElement(this.template);
     }
-
-    return this.#element;
-  }
+  } */
 
   get template() {
     return createNoFilmsTemplate(this.#Message.ALL);
-  }
-
-  removeElement() {
-    this.#element = null;
   }
 }
