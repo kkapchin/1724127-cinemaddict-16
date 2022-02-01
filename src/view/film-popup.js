@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { getDuration } from '../utils/render';
+import { getDuration } from '../utils/movie';
 import AbstractView from './abstract-view';
 
 const createFilmPopupTemplate = (movie) => {

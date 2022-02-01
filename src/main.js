@@ -55,22 +55,22 @@ const renderFilmCard = (container, movie) => {
     document.removeEventListener('keydown', onEscKeyDown);
   });
 
-  render(container, filmCardComponent.element, RenderPosition.BEFOREEND);
+  render(container, filmCardComponent, RenderPosition.BEFOREEND);
 };
 
-render(header, new UserProfileView().element, RenderPosition.BEFOREEND);
-render(main, new SortView().element, RenderPosition.AFTERBEGIN);
-render(main, new FilterView(films).element, RenderPosition.AFTERBEGIN);
-render(footer, new FooterStatsView().element, RenderPosition.BEFOREEND);
+render(header, new UserProfileView(), RenderPosition.BEFOREEND);
+render(main, new SortView(), RenderPosition.AFTERBEGIN);
+render(main, new FilterView(films), RenderPosition.AFTERBEGIN);
+render(footer, new FooterStatsView(), RenderPosition.BEFOREEND);
 
 const renderMovies = (moviesContainer, movies) => {
   const messageContainer = moviesContainer;
   const buttonContainer = moviesContainer;
   if (movies.length === 0) {
-    render(messageContainer, new NoFilmsView().element, RenderPosition.AFTERBEGIN);
+    render(messageContainer, new NoFilmsView(), RenderPosition.AFTERBEGIN);
   } else {
 
-    render(moviesContainer, new FilmsListView().element, RenderPosition.BEFOREEND);
+    render(moviesContainer, new FilmsListView(), RenderPosition.BEFOREEND);
     const filmsListContainer = main.querySelector('.films-list__container');
 
     for (let i = 0; i < Math.min(movies.length, MOVIES_COUNT_PER_STEP); i++) {
@@ -81,7 +81,7 @@ const renderMovies = (moviesContainer, movies) => {
       const showMoreButton = new ShowMoreButtonView();
       let renderedMoviesCount = MOVIES_COUNT_PER_STEP;
 
-      render(buttonContainer, showMoreButton.element, RenderPosition.BEFOREEND);
+      render(buttonContainer, showMoreButton, RenderPosition.BEFOREEND);
 
       showMoreButton.setShowMoreButtonClick(() => {
         movies
