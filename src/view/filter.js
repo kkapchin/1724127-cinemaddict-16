@@ -1,5 +1,6 @@
+import { createElement } from '../utils/render';
 
-export const createNavigationTemplate = (movies) => {
+const createFilterTemplate = (movies) => {
   const watchlist = movies.filter((movie) => movie.userDetails.watchlist === true);
   const history = movies.filter((movie) => movie.userDetails.alreadyWatched === true);
   const favorites = movies.filter((movie) => movie.userDetails.favorite === true);
@@ -15,3 +16,28 @@ export const createNavigationTemplate = (movies) => {
     </nav>`
   );
 };
+
+export default class FilterView {
+  #element = null;
+  #movies = null;
+
+  constructor(movies) {
+    this.#movies = movies;
+  }
+
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
+    }
+
+    return this.#element;
+  }
+
+  get template() {
+    return createFilterTemplate(this.#movies);
+  }
+
+  removeElement() {
+    this.#element = null;
+  }
+}
