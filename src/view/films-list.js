@@ -1,13 +1,26 @@
-import { createFilmCardTemplate } from './film-card';
-import { createShowMoreBtnTemplate } from './show-more-button';
+import { createElement } from '../utils/render';
 
-export const createFilmsListTemplate = (movies) => (
-  `<section class="films">
-    <section class="films-list">
-      <h2 class="films-list__title visually-hidden">All movies. Upcoming</h2>
-        <div class="films-list__container">
-          ${movies.map((movie) => createFilmCardTemplate(movie)).join('')}
-        </div>
-        ${createShowMoreBtnTemplate()}
-  </section>`
+const createFilmsListTemplate = () => (
+  `<div class="films-list__container">
+  </div>`
 );
+
+export default class FilmsListView {
+  #element = null;
+
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
+    }
+
+    return this.#element;
+  }
+
+  get template() {
+    return createFilmsListTemplate();
+  }
+
+  removeElement() {
+    this.#element = null;
+  }
+}
