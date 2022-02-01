@@ -1,103 +1,111 @@
-import { render, RenderPosition } from '../utils/render';
+import { remove, render, RenderPosition } from '../utils/render';
 import FilmCardView from '../view/film-card';
 import FilmPopupView from '../view/film-popup';
 import FilmsListView from '../view/films-list';
 import FilterView from '../view/filter';
-import FooterStatsView from '../view/footer-statistics';
 import NoFilmsView from '../view/no-films';
 import ShowMoreButtonView from '../view/show-more-button';
 import SortView from '../view/sort';
-import UserProfileView from '../view/user-profile';
 
 const MOVIES_COUNT_PER_STEP = 5;
 
 export default class FilmsPresenter {
-  #header = document.querySelector('.header');
-  #main = document.querySelector('.main');
-  #footer = document.querySelector('.footer');
-  #filmsContainer = this.#main.querySelector('.films-list');
-  #messageContainer = this.#filmsContainer;
-  #buttonContainer = this.#filmsContainer;
+  #mainContainer = null;
+  #footerContainer = null;
 
-  #userProfileComponent = new UserProfileView();
+  #filmsContainer = null;
+  #messageContainer = null;
+  #buttonContainer = null;
+
   #sortComponent = new SortView();
   //#filterComponent = new FilterView();
-  #footerStatsComponent = new FooterStatsView();
   #noFilmsComponent = new NoFilmsView();
   #filmsListComponent = new FilmsListView();
 
+  #prevPopupComponent = null;
   #films = [];
 
-  /* constructor(boardContainer) {
-    this.#boardContainer = boardContainer;
-  } */
+  constructor(mainContainer, footerContainer) {
+    this.#mainContainer = mainContainer;
+    this.#footerContainer = footerContainer;
+    this.#filmsContainer = this.#mainContainer.querySelector('.films-list');
+    this.#messageContainer = this.#filmsContainer;
+    this.#buttonContainer = this.#filmsContainer;
+  }
 
   init = (films) => {
     this.#films = [...films];
 
-    render(this.#header, this.#userProfileComponent, RenderPosition.BEFOREEND);
     this.#renderSort();
     this.#renderFilter();
-    render(this.#footer, this.#footerStatsComponent, RenderPosition.BEFOREEND);
 
     this.#renderFilms();
-    // Метод для инициализации (начала работы) модуля,
-    // малая часть текущей функции renderMovies в main.js
   }
 
   #renderFilter = () => {
-    render(this.#main, new FilterView(this.#films), RenderPosition.AFTERBEGIN);
+    render(this.#mainContainer, new FilterView(this.#films), RenderPosition.AFTERBEGIN);
   }
 
   #renderSort = () => {
-    render(this.#main, this.#sortComponent, RenderPosition.AFTERBEGIN);
-    // Метод для рендеринга сортировки
+    render(this.#mainContainer, this.#sortComponent, RenderPosition.AFTERBEGIN);
   }
+
+  #renderPopup = (film) => {
+    if(this.#prevPopupComponent) {
+      remove(this.#prevPopupComponent);
+    }
+    const filmPopupComponent = new FilmPopupView(film);
+
+    filmPopupComponent.setCloseButtonClickHandler(() => {
+      this.#closePopup();
+      document.removeEventListener('keydown', this.#onEscKeyDown);
+    });
+
+    this.#prevPopupComponent = filmPopupComponent;
+    this.#footerContainer.parentElement.classList.add('hide-overflow');
+    this.#footerContainer.parentElement.appendChild(filmPopupComponent.element);
+  }
+
+  #closePopup = () => {
+    this.#footerContainer.parentElement.classList.remove('hide-overflow');
+    remove(this.#prevPopupComponent);
+    this.#prevPopupComponent = null;
+  }
+
+  #onEscKeyDown = (evt) => {
+    if (evt.key === 'Escape' || evt.key === 'Esc') {
+      evt.preventDefault();
+      this.#closePopup();
+      document.removeEventListener('keydown', this.#onEscKeyDown);
+    }
+  };
 
   #renderFilmCard = (film) => {
     const filmCardComponent = new FilmCardView(film);
-    const filmPopupComponent = new FilmPopupView(film);
 
-    const closePopup = (popupElement) => {
-      this.#footer.parentElement.classList.remove('hide-overflow');
-      this.#footer.parentElement.removeChild(popupElement);
-    };
+    /* const closePopup = (popupElement) => {
+      this.#footerContainer.parentElement.classList.remove('hide-overflow');
+      this.#footerContainer.parentElement.removeChild(popupElement);
+    }; */
 
-    const renderPopup = () => {
-      const prevPopup = this.#footer.parentElement.querySelector('.film-details');
-      if (prevPopup) {
-        closePopup(prevPopup);
-      }
-      this.#footer.parentElement.classList.add('hide-overflow');
-      this.#footer.parentElement.appendChild(filmPopupComponent.element);
-    };
-
-    const onEscKeyDown = (evt) => {
+    /* const onEscKeyDown = (evt) => {
       if (evt.key === 'Escape' || evt.key === 'Esc') {
         evt.preventDefault();
-        closePopup(filmPopupComponent.element);
+        this.#closePopup();
         document.removeEventListener('keydown', onEscKeyDown);
       }
-    };
+    }; */
 
     filmCardComponent.setFilmCardClickHandler(() => {
-      renderPopup();
-      document.addEventListener('keydown', onEscKeyDown);
-    });
-
-    filmPopupComponent.setCloseButtonClickHandler(() => {
-      closePopup(filmPopupComponent.element);
-      document.removeEventListener('keydown', onEscKeyDown);
+      this.#renderPopup(film);
+      document.addEventListener('keydown', this.#onEscKeyDown);
     });
 
     render(this.#filmsListComponent, filmCardComponent, RenderPosition.BEFOREEND);
-    // Метод, куда уйдёт логика по созданию и рендерингу компонетов фильма,
-    // текущая функция renderFilmCard в main.js
   }
 
   #renderNoFilms = () => {
     render(this.#messageContainer, this.#noFilmsComponent, RenderPosition.AFTERBEGIN);
-    // Метод для рендеринга заглушки
   }
 
   #renderShowMoreButton = () => {
@@ -117,8 +125,6 @@ export default class FilmsPresenter {
         this.#buttonContainer.removeChild(showMoreButton.element);
       }
     });
-    // Метод, куда уйдёт логика по отрисовке кнопки допоказа карточек фильмов,
-    // сейчас в main.js является частью renderMovies
   }
 
   #renderFilmsListContainer = () => {
@@ -129,7 +135,6 @@ export default class FilmsPresenter {
     if (this.#films.length === 0) {
       this.#renderNoFilms();
     } else {
-      //const filmsListContainer = main.querySelector('.films-list__container');
       this.#renderFilmsListContainer();
       for (let i = 0; i < Math.min(this.#films.length, MOVIES_COUNT_PER_STEP); i++) {
         this.#renderFilmCard(this.#films[i]);
@@ -139,7 +144,5 @@ export default class FilmsPresenter {
         this.#renderShowMoreButton();
       }
     }
-    // Метод для инициализации (начала работы) модуля,
-    // бОльшая часть текущей функции renderMovies в main.js
   }
 }
