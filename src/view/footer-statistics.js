@@ -1,6 +1,10 @@
 import { createElement } from '../utils/render';
 
-const createFooterStatsTemplate = () => '<p>130 291 movies inside</p>';
+const createFooterStatsTemplate = () => (
+  `<section class="footer__statistics">
+    <p>130 291 movies inside</p>
+  </section>`
+);
 
 export default class FooterStatsView {
   #element = null;
