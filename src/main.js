@@ -1,11 +1,11 @@
 import { getMovie } from './mock/movies';
-import { render, renderElement, RenderPosition } from './utils/render';
-import { createFilmCardTemplate } from './view/film-card';
+import { renderElement, RenderPosition } from './utils/render';
 import FooterStatsView from './view/footer-statistics';
 import FilterView from './view/filter';
 import ShowMoreButtonView from './view/show-more-button';
 import SortView from './view/sort';
 import UserProfileView from './view/user-profile';
+import FilmCardView from './view/film-card';
 //import FilmPopupView from './view/film-popup';
 
 const MOVIES_COUNT = 17;
@@ -24,7 +24,7 @@ renderElement(main, new FilterView(movies).element, RenderPosition.AFTERBEGIN);
 renderElement(footer, new FooterStatsView().element, RenderPosition.AFTERBEGIN);
 
 for (let i = 0; i < Math.min(movies.length, MOVIES_COUNT_PER_STEP); i++) {
-  render(moviesContainer, createFilmCardTemplate(movies[i]), RenderPosition.BEFOREEND);
+  renderElement(moviesContainer, new FilmCardView(movies[i]).element, RenderPosition.BEFOREEND);
 }
 
 if (movies.length > MOVIES_COUNT_PER_STEP) {
@@ -38,7 +38,7 @@ if (movies.length > MOVIES_COUNT_PER_STEP) {
     evt.preventDefault();
     movies
       .slice(renderedMoviesCount, renderedMoviesCount + MOVIES_COUNT_PER_STEP)
-      .forEach((movie) => render(moviesContainer, createFilmCardTemplate(movie), RenderPosition.BEFOREEND));
+      .forEach((movie) => renderElement(moviesContainer, new FilmCardView(movie).element, RenderPosition.BEFOREEND));
 
     renderedMoviesCount += MOVIES_COUNT_PER_STEP;
 
