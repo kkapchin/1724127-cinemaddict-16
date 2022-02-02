@@ -23,6 +23,7 @@ export default class FilmsPresenter {
   #noFilmsComponent = new NoFilmsView();
   #filmsListComponent = new FilmsListView();
 
+  #showMoreButtonComponent = null;
   #prevPopupComponent = null;
   #prevSortComponent = null;
   #films = [];
@@ -42,6 +43,17 @@ export default class FilmsPresenter {
     this.#renderFilter();
 
     this.#renderFilms();
+  }
+
+  #getFilms = () => {
+    switch(this.#currentSort) {
+      case SortType.DATE:
+        return this.#films.slice().sort((a, b) => a.filmInfo.release.date < b.filmInfo.release.date);
+      case SortType.RATING:
+        return this.#films.slice().sort((a, b) => a.filmInfo.totalRating < b.filmInfo.totalRating);
+      default:
+        return this.#films.slice();
+    }
   }
 
   #renderFilter = () => {
@@ -116,22 +128,23 @@ export default class FilmsPresenter {
   }
 
   #renderShowMoreButton = () => {
-    const showMoreButton = new ShowMoreButtonView();
+    this.#showMoreButtonComponent = new ShowMoreButtonView();
+    const films = this.#getFilms();
     let renderedMoviesCount = MOVIES_COUNT_PER_STEP;
 
-    render(this.#buttonContainer, showMoreButton, RenderPosition.BEFOREEND);
-
-    showMoreButton.setShowMoreButtonClick(() => {
-      this.#films
+    this.#showMoreButtonComponent.setShowMoreButtonClick(() => {
+      films
         .slice(renderedMoviesCount, renderedMoviesCount + MOVIES_COUNT_PER_STEP)
         .forEach((film) => this.#renderFilmCard(film));
 
       renderedMoviesCount += MOVIES_COUNT_PER_STEP;
 
-      if (renderedMoviesCount >= this.#films.length) {
-        this.#buttonContainer.removeChild(showMoreButton.element);
+      if (renderedMoviesCount >= films.length) {
+        remove(this.#showMoreButtonComponent);
       }
     });
+
+    render(this.#buttonContainer, this.#showMoreButtonComponent, RenderPosition.BEFOREEND);
   }
 
   #renderFilmsListContainer = () => {
@@ -142,9 +155,12 @@ export default class FilmsPresenter {
     if (this.#films.length === 0) {
       this.#renderNoFilms();
     } else {
+      const films = this.#getFilms();
+
       this.#renderFilmsListContainer();
-      for (let i = 0; i < Math.min(this.#films.length, MOVIES_COUNT_PER_STEP); i++) {
-        this.#renderFilmCard(this.#films[i]);
+
+      for (let i = 0; i < Math.min(films.length, MOVIES_COUNT_PER_STEP); i++) {
+        this.#renderFilmCard(films[i]);
       }
 
       if (this.#films.length > MOVIES_COUNT_PER_STEP) {
@@ -164,5 +180,8 @@ export default class FilmsPresenter {
     this.#sortComponent = new SortView(this.#currentSort);
     this.#sortComponent.setSortClickHandler(this.#handleSortClick);
     replace(this.#sortComponent, this.#prevSortComponent);
+    remove(this.#filmsListComponent);
+    remove(this.#showMoreButtonComponent);
+    this.#renderFilms();
   }
 }
