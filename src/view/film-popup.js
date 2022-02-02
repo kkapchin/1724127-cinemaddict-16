@@ -248,6 +248,7 @@ export default class FilmPopupView extends SmartView {
     }
     this.#emoji = emoji;
     this.updateElement();
+    this.element.querySelector('.film-details__emoji-list').scrollIntoView(true);
   }
 
   #infoButtonsClickHandler = (evt) => {
@@ -260,7 +261,7 @@ export default class FilmPopupView extends SmartView {
 
   restoreHandlers = () => {
     this.#setInnerHandlers();
-    this.setCloseButtonClickHandler();
-    this.setInfoButtonsClickHandler();
+    this.setCloseButtonClickHandler(this._callback.closeButtonClick);
+    this.setInfoButtonsClickHandler(this._callback.infoButtonsClick);
   }
 }
