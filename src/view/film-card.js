@@ -1,12 +1,19 @@
 import dayjs from 'dayjs';
 import { getDuration } from '../utils/movie';
-import AbstractView from './abstract-view';
+import SmartView from './smart-view';
 
-const createFilmCardTemplate = (movie) => {
-  const { title, totalRating, genre, description, poster } = movie.filmInfo;
-  const comments = movie.comments;
-  const releaseYear = dayjs(movie.filmInfo.release.date).format('YYYY');
-  const duration = getDuration(movie.filmInfo.runtime);
+const DetailsButton = {
+  WATCHLIST: 'Add to watchlist',
+  WATCHED: 'Mark as watched',
+  FAVORITE: 'Mark as favorite',
+};
+
+const createFilmCardTemplate = (film) => {
+  const { title, totalRating, genre, description, poster } = film.filmInfo;
+  const { watchlist, alreadyWatched, favorite } = film.userDetails;
+  const comments = film.comments;
+  const releaseYear = dayjs(film.filmInfo.release.date).format('YYYY');
+  const duration = getDuration(film.filmInfo.runtime);
 
   return (
     `<article class="film-card">
@@ -23,33 +30,70 @@ const createFilmCardTemplate = (movie) => {
         <span class="film-card__comments">${comments.length} comments</span>
       </a>
       <div class="film-card__controls">
-        <button class="film-card__controls-item film-card__controls-item--add-to-watchlist" type="button">Add to watchlist</button>
-        <button class="film-card__controls-item film-card__controls-item--mark-as-watched" type="button">Mark as watched</button>
-        <button class="film-card__controls-item film-card__controls-item--favorite" type="button">Mark as favorite</button>
+        <button class="film-card__controls-item film-card__controls-item--add-to-watchlist ${watchlist ? 'film-card__controls-item--active' : ''}" type="button">Add to watchlist</button>
+        <button class="film-card__controls-item film-card__controls-item--mark-as-watched ${alreadyWatched ? 'film-card__controls-item--active' : ''}" type="button">Mark as watched</button>
+        <button class="film-card__controls-item film-card__controls-item--favorite ${favorite ? 'film-card__controls-item--active' : ''}" type="button">Mark as favorite</button>
       </div>
     </article>`
   );
 };
 
-export default class FilmCardView extends AbstractView {
-  #movie = null;
+export default class FilmCardView extends SmartView {
+  #film = null;
 
-  constructor(movie) {
+  constructor(film) {
     super();
-    this.#movie = movie;
+    this.data = film;
+
+    this.#setInnerHandlers();
   }
 
   get template() {
-    return createFilmCardTemplate(this.#movie);
+    this.#film = this.data;
+    return createFilmCardTemplate(this.#film);
   }
 
   setFilmCardClickHandler = (callback) => {
-    this._callback.filmCardClick = callback;
+    this.callback.filmCardClick = callback;
     this.element.querySelector('.film-card__link').addEventListener('click', this.#filmCardClickHandler);
+  }
+
+  setInfoButtonsClickHandler = (callback) => {
+    this.callback.infoButtonsClick = callback;
+    this.element.querySelectorAll('.film-card__controls-item').forEach((element) => {
+      element.addEventListener('click', this.#infoButtonsClickHandler);
+    });
   }
 
   #filmCardClickHandler = (evt) => {
     evt.preventDefault();
-    this._callback.filmCardClick();
+    this.callback.filmCardClick();
+  }
+
+  #infoButtonsClickHandler = (evt) => {
+    evt.preventDefault();
+    switch(evt.target.textContent) {
+      case DetailsButton.WATCHLIST:
+        this.#film.userDetails = {...this.#film.userDetails, watchlist: !this.#film.userDetails.watchlist};
+        break;
+      case DetailsButton.WATCHED:
+        this.#film.userDetails = {...this.#film.userDetails, alreadyWatched: !this.#film.userDetails.alreadyWatched};
+        break;
+      case DetailsButton.FAVORITE:
+        this.#film.userDetails = {...this.#film.userDetails, favorite: !this.#film.userDetails.favorite};
+    }
+    this.callback.infoButtonsClick(this.#film);
+    this.updateElement();
+    this.element.querySelector('.film-card__controls-item').scrollIntoView({ block: 'center',  behavior: 'smooth' });
+  }
+
+  #setInnerHandlers = () => {
+    //
+  }
+
+  restoreHandlers = () => {
+    this.#setInnerHandlers();
+    this.setFilmCardClickHandler(this.callback.filmCardClick);
+    this.setInfoButtonsClickHandler(this.callback.infoButtonsClick);
   }
 }

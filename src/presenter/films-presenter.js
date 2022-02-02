@@ -1,3 +1,4 @@
+import { getComments } from '../mock/comments';
 import { remove, render, RenderPosition, replace, SortType } from '../utils/render';
 import FilmCardView from '../view/film-card';
 import FilmPopupView from '../view/film-popup';
@@ -22,6 +23,7 @@ export default class FilmsPresenter {
   //#filterComponent = new FilterView();
   #noFilmsComponent = new NoFilmsView();
   #filmsListComponent = new FilmsListView();
+  #popupSourceComponent = null;
 
   #showMoreButtonComponent = null;
   #prevPopupComponent = null;
@@ -69,28 +71,16 @@ export default class FilmsPresenter {
     if(this.#prevPopupComponent) {
       remove(this.#prevPopupComponent);
     }
-    const filmPopupComponent = new FilmPopupView(film);
+    const comments = getComments();
+    const filmPopupComponent = new FilmPopupView(film, comments);
 
     filmPopupComponent.setCloseButtonClickHandler(() => {
       this.#closePopup();
       document.removeEventListener('keydown', this.#onEscKeyDown);
     });
 
-    filmPopupComponent.setInfoButtonsClickHandler((evt) => {
-      evt.preventDefault();
-      switch(evt.target.id) {
-        case 'watchlist':
-          film.userDetails = {...film.userDetails, watchlist: !film.userDetails.watchlist};
-          this.#renderPopup(film);
-          break;
-        case 'watched':
-          film.userDetails = {...film.userDetails, alreadyWatched: !film.userDetails.alreadyWatched};
-          this.#renderPopup(film);
-          break;
-        case 'favorite':
-          film.userDetails = {...film.userDetails, favorite: !film.userDetails.favorite};
-          this.#renderPopup(film);
-      }
+    filmPopupComponent.setInfoButtonsClickHandler((filmUpdate) => {
+      this.#popupSourceComponent.updateData(filmUpdate);
     });
 
     this.#prevPopupComponent = filmPopupComponent;
@@ -116,8 +106,13 @@ export default class FilmsPresenter {
     const filmCardComponent = new FilmCardView(film);
 
     filmCardComponent.setFilmCardClickHandler(() => {
+      this.#popupSourceComponent = filmCardComponent;
       this.#renderPopup(film);
       document.addEventListener('keydown', this.#onEscKeyDown);
+    });
+
+    filmCardComponent.setInfoButtonsClickHandler((filmUpdate) => {
+      filmCardComponent.updateData(filmUpdate);
     });
 
     render(this.#filmsListComponent, filmCardComponent, RenderPosition.BEFOREEND);

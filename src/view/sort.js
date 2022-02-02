@@ -22,11 +22,11 @@ export default class SortView extends AbstractView {
   }
 
   setSortClickHandler = (callback) => {
-    this._callback.sortClick = callback;
+    this.callback.sortClick = callback;
     this.element.addEventListener('click', this.#sortClickHandler);
   }
 
   #sortClickHandler = (evt) => {
-    this._callback.sortClick(evt);
+    this.callback.sortClick(evt);
   }
 }
