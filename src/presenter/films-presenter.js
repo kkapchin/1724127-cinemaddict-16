@@ -1,5 +1,6 @@
 import { getComments } from '../mock/comments';
-import { remove, render, RenderPosition, replace, SortType } from '../utils/render';
+import { filter } from '../utils/filter';
+import { FilterType, remove, render, RenderPosition, replace, SortType } from '../utils/render';
 import FilmCardView from '../view/film-card';
 import FilmPopupView from '../view/film-popup';
 import FilmsListView from '../view/films-list';
@@ -19,16 +20,17 @@ export default class FilmsPresenter {
   #messageContainer = null;
   #buttonContainer = null;
   #currentSort = SortType.DEFAULT;
+  #currentFilter = FilterType.DEFAULT;
 
   #sortComponent = new SortView();
-  //#filterComponent = new FilterView();
+  #filterComponent = null;
   #noFilmsComponent = new NoFilmsView();
   #filmsListComponent = new FilmsListView();
   #popupSourceComponent = null;
 
   #showMoreButtonComponent = null;
   #prevPopupComponent = null;
-  #prevSortComponent = null;
+  #prevFilterComponent = null;
   //#films = [];
 
   constructor(mainContainer, footerContainer, filmsModel) {
@@ -48,19 +50,21 @@ export default class FilmsPresenter {
   }
 
   get films() {
-
+    const filteresFilms = filter[this.#currentFilter](this.#filmsModel.films);
     switch(this.#currentSort) {
       case SortType.DATE:
-        return this.#filmsModel.films.slice().sort((a, b) => a.filmInfo.release.date < b.filmInfo.release.date);
+        return filteresFilms.sort((a, b) => a.filmInfo.release.date < b.filmInfo.release.date);
       case SortType.RATING:
-        return this.#filmsModel.films.slice().sort((a, b) => a.filmInfo.totalRating < b.filmInfo.totalRating);
+        return filteresFilms.sort((a, b) => a.filmInfo.totalRating < b.filmInfo.totalRating);
       default:
-        return this.#filmsModel.films.slice();
+        return filteresFilms;
     }
   }
 
   #renderFilter = () => {
-    render(this.#mainContainer, new FilterView(this.films), RenderPosition.AFTERBEGIN);
+    this.#filterComponent = new FilterView(this.films, this.#currentFilter);
+    this.#filterComponent.setFilterClickHandler(this.#handleFilterClick);
+    render(this.#mainContainer, this.#filterComponent, RenderPosition.AFTERBEGIN);
   }
 
   #renderSort = () => {
@@ -164,16 +168,29 @@ export default class FilmsPresenter {
   }
 
   #handleSortClick = (evt) => {
-    evt.preventDefault();
     const sortType = evt.target.text;
     if(sortType === this.#currentSort) {
       return;
     }
-    this.#prevSortComponent = this.#sortComponent;
+    this.#prevFilterComponent = this.#sortComponent;
     this.#currentSort = sortType;
     this.#sortComponent = new SortView(this.#currentSort);
     this.#sortComponent.setSortClickHandler(this.#handleSortClick);
-    replace(this.#sortComponent, this.#prevSortComponent);
+    replace(this.#sortComponent, this.#prevFilterComponent);
+    remove(this.#filmsListComponent);
+    remove(this.#showMoreButtonComponent);
+    this.#renderFilms();
+  }
+
+  #handleFilterClick = (filterUpdate) => {
+    if(filterUpdate === this.#currentFilter) {
+      return;
+    }
+    this.#prevFilterComponent = this.#filterComponent;
+    this.#currentFilter = filterUpdate;
+    this.#filterComponent = new FilterView(this.films, this.#currentFilter);
+    this.#filterComponent.setFilterClickHandler(this.#handleFilterClick);
+    replace(this.#filterComponent, this.#prevFilterComponent);
     remove(this.#filmsListComponent);
     remove(this.#showMoreButtonComponent);
     this.#renderFilms();

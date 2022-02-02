@@ -13,6 +13,13 @@ export const SortType = {
   RATING: 'Sort by rating',
 };
 
+export const FilterType = {
+  DEFAULT: 'All',
+  WATCHLIST: 'Watchlist',
+  HISTORY: 'History',
+  FAVORITES: 'Favorites',
+};
+
 export const render = (container, element, place) => {
   const parent = container instanceof AbstractView ? container.element : container;
   const child = element instanceof AbstractView ? element.element : element;

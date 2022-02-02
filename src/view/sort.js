@@ -11,7 +11,6 @@ const createSortTemplate = (currentSort) => (
 
 export default class SortView extends AbstractView {
   #sort = null;
-  //#callback = {};
 
   constructor(sort = SortType.DEFAULT) {
     super();
@@ -24,10 +23,13 @@ export default class SortView extends AbstractView {
 
   setSortClickHandler = (callback) => {
     this.callback.sortClick = callback;
-    this.element.addEventListener('click', this.#sortClickHandler);
+    this.element.querySelectorAll('.sort__button').forEach((element) => {
+      element.addEventListener('click', this.#sortClickHandler);
+    });
   }
 
   #sortClickHandler = (evt) => {
+    evt.preventDefault();
     this.callback.sortClick(evt);
   }
 }
