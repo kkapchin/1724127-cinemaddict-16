@@ -61,6 +61,22 @@ export default class FilmsPresenter {
       document.removeEventListener('keydown', this.#onEscKeyDown);
     });
 
+    filmPopupComponent.setInfoButtonsClickHandler((evt) => {
+      switch(evt.target.id) {
+        case 'watchlist':
+          film.userDetails = {...film.userDetails, watchlist: !film.userDetails.watchlist};
+          this.#renderPopup(film);
+          break;
+        case 'watched':
+          film.userDetails = {...film.userDetails, alreadyWatched: !film.userDetails.alreadyWatched};
+          this.#renderPopup(film);
+          break;
+        case 'favorite':
+          film.userDetails = {...film.userDetails, favorite: !film.userDetails.favorite};
+          this.#renderPopup(film);
+      }
+    });
+
     this.#prevPopupComponent = filmPopupComponent;
     this.#footerContainer.parentElement.classList.add('hide-overflow');
     this.#footerContainer.parentElement.appendChild(filmPopupComponent.element);
@@ -82,19 +98,6 @@ export default class FilmsPresenter {
 
   #renderFilmCard = (film) => {
     const filmCardComponent = new FilmCardView(film);
-
-    /* const closePopup = (popupElement) => {
-      this.#footerContainer.parentElement.classList.remove('hide-overflow');
-      this.#footerContainer.parentElement.removeChild(popupElement);
-    }; */
-
-    /* const onEscKeyDown = (evt) => {
-      if (evt.key === 'Escape' || evt.key === 'Esc') {
-        evt.preventDefault();
-        this.#closePopup();
-        document.removeEventListener('keydown', onEscKeyDown);
-      }
-    }; */
 
     filmCardComponent.setFilmCardClickHandler(() => {
       this.#renderPopup(film);
