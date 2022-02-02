@@ -13,6 +13,7 @@ const MOVIES_COUNT_PER_STEP = 5;
 export default class FilmsPresenter {
   #mainContainer = null;
   #footerContainer = null;
+  #filmsModel = null;
 
   #filmsContainer = null;
   #messageContainer = null;
@@ -28,38 +29,38 @@ export default class FilmsPresenter {
   #showMoreButtonComponent = null;
   #prevPopupComponent = null;
   #prevSortComponent = null;
-  #films = [];
+  //#films = [];
 
-  constructor(mainContainer, footerContainer) {
+  constructor(mainContainer, footerContainer, filmsModel) {
     this.#mainContainer = mainContainer;
     this.#footerContainer = footerContainer;
+    this.#filmsModel = filmsModel;
     this.#filmsContainer = this.#mainContainer.querySelector('.films-list');
     this.#messageContainer = this.#filmsContainer;
     this.#buttonContainer = this.#filmsContainer;
   }
 
-  init = (films) => {
-    this.#films = [...films];
-
+  init = () => {
     this.#renderSort();
     this.#renderFilter();
 
     this.#renderFilms();
   }
 
-  #getFilms = () => {
+  get films() {
+
     switch(this.#currentSort) {
       case SortType.DATE:
-        return this.#films.slice().sort((a, b) => a.filmInfo.release.date < b.filmInfo.release.date);
+        return this.#filmsModel.films.slice().sort((a, b) => a.filmInfo.release.date < b.filmInfo.release.date);
       case SortType.RATING:
-        return this.#films.slice().sort((a, b) => a.filmInfo.totalRating < b.filmInfo.totalRating);
+        return this.#filmsModel.films.slice().sort((a, b) => a.filmInfo.totalRating < b.filmInfo.totalRating);
       default:
-        return this.#films.slice();
+        return this.#filmsModel.films.slice();
     }
   }
 
   #renderFilter = () => {
-    render(this.#mainContainer, new FilterView(this.#films), RenderPosition.AFTERBEGIN);
+    render(this.#mainContainer, new FilterView(this.films), RenderPosition.AFTERBEGIN);
   }
 
   #renderSort = () => {
@@ -124,17 +125,16 @@ export default class FilmsPresenter {
 
   #renderShowMoreButton = () => {
     this.#showMoreButtonComponent = new ShowMoreButtonView();
-    const films = this.#getFilms();
     let renderedMoviesCount = MOVIES_COUNT_PER_STEP;
 
     this.#showMoreButtonComponent.setShowMoreButtonClick(() => {
-      films
+      this.films
         .slice(renderedMoviesCount, renderedMoviesCount + MOVIES_COUNT_PER_STEP)
         .forEach((film) => this.#renderFilmCard(film));
 
       renderedMoviesCount += MOVIES_COUNT_PER_STEP;
 
-      if (renderedMoviesCount >= films.length) {
+      if (renderedMoviesCount >= this.films.length) {
         remove(this.#showMoreButtonComponent);
       }
     });
@@ -147,18 +147,17 @@ export default class FilmsPresenter {
   }
 
   #renderFilms = () => {
-    if (this.#films.length === 0) {
+    if (this.films.length === 0) {
       this.#renderNoFilms();
     } else {
-      const films = this.#getFilms();
 
       this.#renderFilmsListContainer();
 
-      for (let i = 0; i < Math.min(films.length, MOVIES_COUNT_PER_STEP); i++) {
-        this.#renderFilmCard(films[i]);
+      for (let i = 0; i < Math.min(this.films.length, MOVIES_COUNT_PER_STEP); i++) {
+        this.#renderFilmCard(this.films[i]);
       }
 
-      if (this.#films.length > MOVIES_COUNT_PER_STEP) {
+      if (this.films.length > MOVIES_COUNT_PER_STEP) {
         this.#renderShowMoreButton();
       }
     }

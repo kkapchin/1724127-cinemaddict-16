@@ -10,6 +10,10 @@ export default class AbstractView {
     }
   }
 
+  get callback() {
+    return this.#callback;
+  }
+
   get element() {
     if (!this.#element) {
       this.#element = createElement(this.template);
