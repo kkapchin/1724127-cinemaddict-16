@@ -7,6 +7,12 @@ export const RenderPosition = {
   AFTEREND: 'afterend',
 };
 
+export const SortType = {
+  DEFAULT: 'Sort by default',
+  DATE: 'Sort by date',
+  RATING: 'Sort by rating',
+};
+
 export const render = (container, element, place) => {
   const parent = container instanceof AbstractView ? container.element : container;
   const child = element instanceof AbstractView ? element.element : element;

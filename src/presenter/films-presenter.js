@@ -1,4 +1,4 @@
-import { remove, render, RenderPosition } from '../utils/render';
+import { remove, render, RenderPosition, replace, SortType } from '../utils/render';
 import FilmCardView from '../view/film-card';
 import FilmPopupView from '../view/film-popup';
 import FilmsListView from '../view/films-list';
@@ -16,6 +16,7 @@ export default class FilmsPresenter {
   #filmsContainer = null;
   #messageContainer = null;
   #buttonContainer = null;
+  #currentSort = SortType.DEFAULT;
 
   #sortComponent = new SortView();
   //#filterComponent = new FilterView();
@@ -23,6 +24,7 @@ export default class FilmsPresenter {
   #filmsListComponent = new FilmsListView();
 
   #prevPopupComponent = null;
+  #prevSortComponent = null;
   #films = [];
 
   constructor(mainContainer, footerContainer) {
@@ -47,6 +49,7 @@ export default class FilmsPresenter {
   }
 
   #renderSort = () => {
+    this.#sortComponent.setSortClickHandler(this.#handleSortClick);
     render(this.#mainContainer, this.#sortComponent, RenderPosition.AFTERBEGIN);
   }
 
@@ -62,6 +65,7 @@ export default class FilmsPresenter {
     });
 
     filmPopupComponent.setInfoButtonsClickHandler((evt) => {
+      evt.preventDefault();
       switch(evt.target.id) {
         case 'watchlist':
           film.userDetails = {...film.userDetails, watchlist: !film.userDetails.watchlist};
@@ -147,5 +151,18 @@ export default class FilmsPresenter {
         this.#renderShowMoreButton();
       }
     }
+  }
+
+  #handleSortClick = (evt) => {
+    evt.preventDefault();
+    const sortType = evt.target.text;
+    if(sortType === this.#currentSort) {
+      return;
+    }
+    this.#prevSortComponent = this.#sortComponent;
+    this.#currentSort = sortType;
+    this.#sortComponent = new SortView(this.#currentSort);
+    this.#sortComponent.setSortClickHandler(this.#handleSortClick);
+    replace(this.#sortComponent, this.#prevSortComponent);
   }
 }
