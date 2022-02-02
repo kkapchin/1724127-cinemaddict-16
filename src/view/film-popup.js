@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import { getDuration } from '../utils/movie';
-import AbstractView from './abstract-view';
+import SmartView from './smart-view';
 
 const createFilmPopupTemplate = (movie) => {
   const { title, totalRating, genre, description, poster, ageRating, director } = movie.filmInfo;
@@ -199,7 +199,7 @@ const createFilmPopupTemplate = (movie) => {
     </section>`);
 };
 
-export default class FilmPopupView extends AbstractView {
+export default class FilmPopupView extends SmartView {
   #movie = null;
 
   constructor(movie) {
@@ -227,5 +227,9 @@ export default class FilmPopupView extends AbstractView {
 
   #infoButtonsClickHandler = (evt) => {
     this._callback.infoButtonsClick(evt);
+  }
+
+  restoreHandlers = () => {
+    //
   }
 }
