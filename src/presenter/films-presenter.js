@@ -1,4 +1,4 @@
-import { remove, render, RenderPosition } from '../utils/render';
+import { remove, render, RenderPosition, replace, SortType } from '../utils/render';
 import FilmCardView from '../view/film-card';
 import FilmPopupView from '../view/film-popup';
 import FilmsListView from '../view/films-list';
@@ -16,13 +16,16 @@ export default class FilmsPresenter {
   #filmsContainer = null;
   #messageContainer = null;
   #buttonContainer = null;
+  #currentSort = SortType.DEFAULT;
 
   #sortComponent = new SortView();
   //#filterComponent = new FilterView();
   #noFilmsComponent = new NoFilmsView();
   #filmsListComponent = new FilmsListView();
 
+  #showMoreButtonComponent = null;
   #prevPopupComponent = null;
+  #prevSortComponent = null;
   #films = [];
 
   constructor(mainContainer, footerContainer) {
@@ -42,11 +45,23 @@ export default class FilmsPresenter {
     this.#renderFilms();
   }
 
+  #getFilms = () => {
+    switch(this.#currentSort) {
+      case SortType.DATE:
+        return this.#films.slice().sort((a, b) => a.filmInfo.release.date < b.filmInfo.release.date);
+      case SortType.RATING:
+        return this.#films.slice().sort((a, b) => a.filmInfo.totalRating < b.filmInfo.totalRating);
+      default:
+        return this.#films.slice();
+    }
+  }
+
   #renderFilter = () => {
     render(this.#mainContainer, new FilterView(this.#films), RenderPosition.AFTERBEGIN);
   }
 
   #renderSort = () => {
+    this.#sortComponent.setSortClickHandler(this.#handleSortClick);
     render(this.#mainContainer, this.#sortComponent, RenderPosition.AFTERBEGIN);
   }
 
@@ -62,6 +77,7 @@ export default class FilmsPresenter {
     });
 
     filmPopupComponent.setInfoButtonsClickHandler((evt) => {
+      evt.preventDefault();
       switch(evt.target.id) {
         case 'watchlist':
           film.userDetails = {...film.userDetails, watchlist: !film.userDetails.watchlist};
@@ -112,22 +128,23 @@ export default class FilmsPresenter {
   }
 
   #renderShowMoreButton = () => {
-    const showMoreButton = new ShowMoreButtonView();
+    this.#showMoreButtonComponent = new ShowMoreButtonView();
+    const films = this.#getFilms();
     let renderedMoviesCount = MOVIES_COUNT_PER_STEP;
 
-    render(this.#buttonContainer, showMoreButton, RenderPosition.BEFOREEND);
-
-    showMoreButton.setShowMoreButtonClick(() => {
-      this.#films
+    this.#showMoreButtonComponent.setShowMoreButtonClick(() => {
+      films
         .slice(renderedMoviesCount, renderedMoviesCount + MOVIES_COUNT_PER_STEP)
         .forEach((film) => this.#renderFilmCard(film));
 
       renderedMoviesCount += MOVIES_COUNT_PER_STEP;
 
-      if (renderedMoviesCount >= this.#films.length) {
-        this.#buttonContainer.removeChild(showMoreButton.element);
+      if (renderedMoviesCount >= films.length) {
+        remove(this.#showMoreButtonComponent);
       }
     });
+
+    render(this.#buttonContainer, this.#showMoreButtonComponent, RenderPosition.BEFOREEND);
   }
 
   #renderFilmsListContainer = () => {
@@ -138,14 +155,33 @@ export default class FilmsPresenter {
     if (this.#films.length === 0) {
       this.#renderNoFilms();
     } else {
+      const films = this.#getFilms();
+
       this.#renderFilmsListContainer();
-      for (let i = 0; i < Math.min(this.#films.length, MOVIES_COUNT_PER_STEP); i++) {
-        this.#renderFilmCard(this.#films[i]);
+
+      for (let i = 0; i < Math.min(films.length, MOVIES_COUNT_PER_STEP); i++) {
+        this.#renderFilmCard(films[i]);
       }
 
       if (this.#films.length > MOVIES_COUNT_PER_STEP) {
         this.#renderShowMoreButton();
       }
     }
+  }
+
+  #handleSortClick = (evt) => {
+    evt.preventDefault();
+    const sortType = evt.target.text;
+    if(sortType === this.#currentSort) {
+      return;
+    }
+    this.#prevSortComponent = this.#sortComponent;
+    this.#currentSort = sortType;
+    this.#sortComponent = new SortView(this.#currentSort);
+    this.#sortComponent.setSortClickHandler(this.#handleSortClick);
+    replace(this.#sortComponent, this.#prevSortComponent);
+    remove(this.#filmsListComponent);
+    remove(this.#showMoreButtonComponent);
+    this.#renderFilms();
   }
 }
